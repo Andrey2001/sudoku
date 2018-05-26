@@ -111,7 +111,7 @@ void zanyato1()
                     {
                         for(int y = 3 * Y; y < 3 * (Y + 1); y++)
                         {
-                            if(m[x][y] == 0 && ((m1[x][y][numb1] != 2 && m1[x][y][numb2] == 2) || ( m1[x][y][numb1] == 2 && m1[x][y][numb2] != 2)))
+                            if((m[x][y] == 0 && ((m1[x][y][numb1] != 2 && m1[x][y][numb2] == 2) || ( m1[x][y][numb1] == 2 && m1[x][y][numb2] != 2))) || (m[x][y] != 0 && (m1[x][y][numb2] == 3 || m1[x][y][numb1] ==  3)))
                             {
                                 a = 100;
                                 break;
@@ -188,6 +188,7 @@ int main2(void * fld)
                         m[x][y] = k;
                         summ--;
                         Set(x, y, m[x][y], fld); ///
+                        d = 0;
                     }
                     d = 0;
                 }
