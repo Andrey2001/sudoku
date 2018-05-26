@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string.h>
 
 using namespace std;
 
@@ -150,7 +151,9 @@ void Set(int y, int x, int v, void * fld); ///
 
 int main2(void * fld)
 {
-    int summ = 81, k, d = 0;
+    int summ = 81, k, d = 0, numb = 0;
+    memset(m, 0, sizeof(m));
+    memset(m1, 0, sizeof(m1));
     for(int i = 0; i < 9; i++)
     {
         for(int j = 0; j < 9; j++)
