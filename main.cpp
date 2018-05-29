@@ -87,7 +87,7 @@ void stolbikstrochkasquare(int x, int y)
                     }
                     if(f != 0)  break;
                 }
-                if(f == 0 && m1[x][y][numb] != 1)
+                if(f == 0)
                 {
                     m1[x][y][numb] = 2;
                     shoting(x, y);
@@ -114,7 +114,7 @@ void zanyato1()
                         {
                             if((m[x][y] == 0 && ((m1[x][y][numb1] != 2 && m1[x][y][numb2] == 2) || ( m1[x][y][numb1] == 2 && m1[x][y][numb2] != 2))) || (m[x][y] != 0 && (m1[x][y][numb2] == 3 || m1[x][y][numb1] ==  3)))
                             {
-                                a = 100;
+                                a = 1000;
                                 break;
                             }
                             if(m[x][y] == 0 && m1[x][y][numb1] == 2 && m1[x][y][numb2] == 2)
@@ -124,7 +124,7 @@ void zanyato1()
                                 j = j * 10 + y;
                             }
                         }
-                        if(a == 100) break;
+                        if(a == 1000) break;
                     }
                     if(a == 2)
                     {
@@ -146,12 +146,13 @@ void zanyato1()
     }
 }
 
+
 int Get(int y, int x, void * fld); ///
 void Set(int y, int x, int v, void * fld); ///
 
 int main2(void * fld)
 {
-    int summ = 81, k, d = 0, numb = 0;
+    int summ = 81, k = 0, d = 0, numb = 0;
     memset(m, 0, sizeof(m));
     memset(m1, 0, sizeof(m1));
     for(int i = 0; i < 9; i++)
@@ -193,11 +194,10 @@ int main2(void * fld)
                         Set(x, y, m[x][y], fld); ///
                         d = 0;
                     }
-                    d = 0;
+                    else d = 0;
                 }
             }
         }
-        zanyato1();
         w++;
     }
     /*cout << endl;

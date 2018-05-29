@@ -1,0 +1,60 @@
+# depslib dependency file v1.0
+1526121522 source:c:\users\Андрей\desktop\Информатика\graph.bak\main.cpp
+	<iostream>
+
+1446667740 source:c:\users\Андрей\desktop\Информатика\graph.bak\resource.rc
+	"wx/msw/wx.rc"
+
+1521562992 source:c:\users\Андрей\desktop\Информатика\graph.bak\sudoku.cpp
+	"Sudoku.h"
+	<wx/intl.h>
+	<wx/string.h>
+	<wx/utils.h>
+	<wx/filedlg.h>
+	<wx/msw/filedlg.h>
+	<wx/app.h>
+
+1521520155 c:\users\Андрей\desktop\Информатика\graph.bak\sudoku.h
+	<wx/textctrl.h>
+	<wx/panel.h>
+	<wx/button.h>
+	<wx/dialog.h>
+
+1516170250 source:c:\users\Андрей\desktop\Информатика\graph.bak\wxtestapp.cpp
+	"wx_pch.h"
+	"wxTestApp.h"
+	"Sudoku.h"
+
+1516170247 c:\users\Андрей\desktop\Информатика\graph.bak\wxtestapp.h
+	<wx/app.h>
+
+1527345130 source:c:\users\Андрей\desktop\Информатика\СУДОКУ\graph.bak\main.cpp
+	<iostream>
+	<string.h>
+
+1446667740 source:c:\users\Андрей\desktop\Информатика\СУДОКУ\graph.bak\resource.rc
+	"wx/msw/wx.rc"
+
+1521562992 source:c:\users\Андрей\desktop\Информатика\СУДОКУ\graph.bak\sudoku.cpp
+	"Sudoku.h"
+	<wx/intl.h>
+	<wx/string.h>
+	<wx/utils.h>
+	<wx/filedlg.h>
+	<wx/msw/filedlg.h>
+	<wx/app.h>
+
+1521520155 c:\users\Андрей\desktop\Информатика\СУДОКУ\graph.bak\sudoku.h
+	<wx/textctrl.h>
+	<wx/panel.h>
+	<wx/button.h>
+	<wx/dialog.h>
+
+1516170250 source:c:\users\Андрей\desktop\Информатика\СУДОКУ\graph.bak\wxtestapp.cpp
+	"wx_pch.h"
+	"wxTestApp.h"
+	"Sudoku.h"
+
+1516170247 c:\users\Андрей\desktop\Информатика\СУДОКУ\graph.bak\wxtestapp.h
+	<wx/app.h>
+
