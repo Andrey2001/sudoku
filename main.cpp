@@ -152,7 +152,8 @@ void Set(int y, int x, int v, void * fld); ///
 
 int main2(void * fld)
 {
-    int summ = 81, k = 0, d = 0, numb = 0;
+    int summ = 81, k = 0, d = 0;
+    numb = w = 0;
     memset(m, 0, sizeof(m));
     memset(m1, 0, sizeof(m1));
     for(int i = 0; i < 9; i++)
