@@ -110,12 +110,12 @@ END_EVENT_TABLE()
 Sudoku::Sudoku(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
 {
 	//(*Initialize(Sudoku)
-	Create(parent, wxID_ANY, _("Судоку"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Г‘ГіГ¤Г®ГЄГі"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	SetClientSize(wxSize(414,462));
-	btnClean = new wxButton(this, ID_BUTTON1, _("Очистить"), wxPoint(14,416), wxSize(86,28), 0, wxDefaultValidator, _T("ID_BUTTON1"));
-	btnSave = new wxButton(this, ID_BUTTON2, _("Сохранить"), wxPoint(116,416), wxSize(86,28), 0, wxDefaultValidator, _T("ID_BUTTON2"));
-	btnLoad = new wxButton(this, ID_BUTTON3, _("Загрузить"), wxPoint(214,416), wxSize(86,28), 0, wxDefaultValidator, _T("ID_BUTTON3"));
-	btnSolve = new wxButton(this, ID_BUTTON4, _("Решить"), wxPoint(312,416), wxSize(86,28), 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	btnClean = new wxButton(this, ID_BUTTON1, _("ГЋГ·ГЁГ±ГІГЁГІГј"), wxPoint(14,416), wxSize(86,28), 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	btnSave = new wxButton(this, ID_BUTTON2, _("Г‘Г®ГµГ°Г Г­ГЁГІГј"), wxPoint(116,416), wxSize(86,28), 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	btnLoad = new wxButton(this, ID_BUTTON3, _("Г‡Г ГЈГ°ГіГ§ГЁГІГј"), wxPoint(214,416), wxSize(86,28), 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	btnSolve = new wxButton(this, ID_BUTTON4, _("ГђГҐГёГЁГІГј"), wxPoint(312,416), wxSize(86,28), 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	Panel9 = new wxPanel(this, ID_PANEL9, wxPoint(8,8), wxSize(128,128), wxTAB_TRAVERSAL, _T("ID_PANEL9"));
 	TextCtrl73 = new wxTextCtrl(Panel9, ID_TEXTCTRL73, _("01"), wxPoint(8,8), wxSize(32,32), 0, wxDefaultValidator, _T("ID_TEXTCTRL73"));
 	TextCtrl74 = new wxTextCtrl(Panel9, ID_TEXTCTRL74, _("02"), wxPoint(48,8), wxSize(32,32), 0, wxDefaultValidator, _T("ID_TEXTCTRL74"));
@@ -337,8 +337,8 @@ void Set(int y, int x, int v, void * fld)
     wxString s = "";
     if (1 <= v && v <= 9) s.append((char)('0' + v));
     (*field)[y][x]->SetValue(s);
-    wxYield();  // отрисовать изменения на форме
-    Sleep(1000); // пауза 0.1 секунды
+    wxYield();  // Г®ГІГ°ГЁГ±Г®ГўГ ГІГј ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГї Г­Г  ГґГ®Г°Г¬ГҐ
+    Sleep(100); // ГЇГ ГіГ§Г  0.1 Г±ГҐГЄГіГ­Г¤Г»
 }
 
 int main2(void * fld);
@@ -354,7 +354,7 @@ void Sudoku::OnbtnSolveClick(wxCommandEvent& event)
 
 void Sudoku::OnbtnLoadClick(wxCommandEvent& event)
 {
-    wxFileDialog * o = new wxFileDialog(this, "Загрузка головоломки", ".", wxEmptyString, "*.txt", wxFD_OPEN);
+    wxFileDialog * o = new wxFileDialog(this, "Г‡Г ГЈГ°ГіГ§ГЄГ  ГЈГ®Г«Г®ГўГ®Г«Г®Г¬ГЄГЁ", ".", wxEmptyString, "*.txt", wxFD_OPEN);
     if (o->ShowModal() == wxID_OK) {
         FILE * f = fopen(o->GetPath(), "r");
         if (f) {  int y, x;  char s[99];
@@ -373,7 +373,7 @@ void Sudoku::OnbtnLoadClick(wxCommandEvent& event)
 
 void Sudoku::OnbtnSaveClick(wxCommandEvent& event)
 {
-    wxFileDialog * o = new wxFileDialog(this, "Сохранение головоломки", ".", wxEmptyString, "*.txt", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+    wxFileDialog * o = new wxFileDialog(this, "Г‘Г®ГµГ°Г Г­ГҐГ­ГЁГҐ ГЈГ®Г«Г®ГўГ®Г«Г®Г¬ГЄГЁ", ".", wxEmptyString, "*.txt", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if (o->ShowModal() == wxID_OK) {
         FILE * f = fopen(o->GetPath(), "w");
         if (f) {  int y, x;
