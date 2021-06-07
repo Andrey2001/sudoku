@@ -3,42 +3,90 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
+#include "thread.h"
+#include "thread_func.h"
 
 using namespace std;
-
-class thread
-{
-    public:
-    int i;
-    int j;
-    int numb;
-    vector <vector<int> > arr;
-
-    thread ()
-    {
-        arr.resize(9);
-        for (unsigned i = 0; i < arr.size(); i++) arr[i].resize(9);
-    }
-};
 
 void first(int i, int j,
            int numb,
            vector <vector<int> > &m,
-           vector <vector <vector<int> > > &m1) // ������ ��������, ������ ������ �����
+           vector <vector <vector<bool> > > &m1,
+           int t) // первый алгоритм, ставит только флаги
 {
-    for(int i1 = 0; i1 < 9; i1++) // ������ �� �������
+    for(int i1 = 0; i1 < 9; i1++) // проход по столбцу
     {
-        if(m[i1][j] == 0 && m1[i1][j][numb] == 0) m1[i1][j][numb] = 1;
+        if(m[i1][j] == 0) m1[i1][j][numb] = 1;
     }
-    for(int j1 = 0; j1 < 9; j1++) // ������ �� ������
+    for(int j1 = 0; j1 < 9; j1++) // проход по строке
     {
-        if(m[i][j1] == 0 && m1[i][j1][numb] == 0) m1[i][j1][numb] = 1;
+        if(m[i][j1] == 0) m1[i][j1][numb] = 1;
     }
-    for(int i1 = i - (i % 3); i1 < i - (i % 3) + 3; i1++) // ������ �� ������ ��������
+    for(int i1 = i - (i % 3); i1 < i - (i % 3) + 3; i1++) // проход по малому квадрату
     {
         for(int j1 = j - (j % 3); j1 < j - (j % 3) + 3; j1++)
         {
-            if(m[i1][j1] == 0 && m1[i1][j1][numb] == 0) m1[i1][j1][numb] = 1;
+            if(m[i1][j1] == 0) m1[i1][j1][numb] = 1;
+        }
+    }
+    if (t == 1)
+    {
+        if (i == j) // главная диагональ
+        {
+            for (int x = 0; x < 9; x++)
+            {
+                if (m[x][x] == 0) m1[x][x][numb] = 1;
+            }
+        }
+        if (i + j == 8) // побочная диагональ
+        {
+            for (int x = 0; x < 9; x++)
+            {
+                if(m[x][8 - x] == 0) m1[x][8 - x][numb] = 1;
+            }
+        }
+    }
+    if (t == 2)
+    {
+        if (0 < i && i < 4 && 0 < j && j < 4)
+        {
+            for (int x = 1; x < 4; x++)
+            {
+                for (int y = 1; y < 4; y++)
+                {
+                    if (m[x][y] == 0) m1[x][y][numb] = 1;
+                }
+            }
+        }
+        if (0 < i && i < 4 && 4 < j && j < 8)
+        {
+            for (int x = 1; x < 4; x++)
+            {
+                for (int y = 5; y < 8; y++)
+                {
+                    if (m[x][y] == 0) m1[x][y][numb] = 1;
+                }
+            }
+        }
+        if (4 < i && i < 8 && 0 < j && j < 4)
+        {
+            for (int x = 5; x < 8; x++)
+            {
+                for (int y = 1; y < 4; y++)
+                {
+                    if (m[x][y] == 0) m1[x][y][numb] = 1;
+                }
+            }
+        }
+        if (4 < i && i < 8 && 4 < j && j < 8)
+        {
+            for (int x = 5; x < 8; x++)
+            {
+                for (int y = 5; y < 8; y++)
+                {
+                    if (m[x][y] == 0) m1[x][y][numb] = 1;
+                }
+            }
         }
     }
 }
@@ -46,14 +94,15 @@ void first(int i, int j,
 void second(int i, int j,
             int *summ,
             vector <vector<int> > &m,
-            vector <vector <vector<int> > > &m1) // ������ �������� ������ �����
+            vector <vector <vector<bool> > > &m1,
+            int t) // второй алгоритм ставит числа
 {
     int a = 0;
     for(int numb = 0; numb < 9; numb++)
     {
         if(m1[i][j][numb] == 1) a++;
     }
-    if(a == 8) // �� ������, ������ ���� ����� ����� ��������� � ������
+    if(a == 8) // по цифрам, только одну цифру можно поставить в клетку
     {
         for(int numb = 0; numb < 9; numb++)
         {
@@ -61,7 +110,7 @@ void second(int i, int j,
             {
                 m[i][j] = numb + 1;
                 (*summ)--;
-                first(i, j, numb, m, m1);
+                first(i, j, numb, m, m1, t);
                 a = 0;
                 return;
             }
@@ -73,7 +122,7 @@ void second(int i, int j,
         if(m[i][j] == 0 && m1[i][j][numb] == 0)
         {
             bool flag = 0;
-            for(int i1 = 0; i1 < 9; i1++) // �� ������
+            for(int i1 = 0; i1 < 9; i1++) // по стобцу
             {
                 if(m1[i1][j][numb] == 0 && m[i1][j] == 0 && i1 != i)
                 {
@@ -81,16 +130,16 @@ void second(int i, int j,
                     break;
                 }
             }
-            if(flag == 0) // ������ � ��� ������ � ������� ����� ��������� ������ �����
+            if(flag == 0) // только в эту клетку в столбце можно поставить данное число
             {
                 m[i][j] = numb + 1;
                 (*summ)--;
-                first(i, j, numb, m, m1);
+                first(i, j, numb, m, m1, t);
                 return;
             }
 
             flag = 0;
-            for(int j1 = 0; j1 < 9; j1++) // �� ������
+            for(int j1 = 0; j1 < 9; j1++) // по строке
             {
                 if(m1[i][j1][numb] == 0 && m[i][j1] == 0 && j1 != j)
                 {
@@ -98,17 +147,17 @@ void second(int i, int j,
                     break;
                 }
             }
-            if(flag == 0) // ������ � ��� ������ � ������ ����� ��������� ������ �����
+            if(flag == 0) // только в эту клетку в строке можно поставить данное число
             {
                 m[i][j] = numb + 1;
                 (*summ)--;
-                first(i, j, numb, m, m1);
+                first(i, j, numb, m, m1, t);
                 return;
             }
 
 
             flag = 0;
-            for(int i1 = i - (i % 3); i1 < i - (i % 3) + 3; i1++) // ������ �� ������ ��������
+            for(int i1 = i - (i % 3); i1 < i - (i % 3) + 3; i1++) // проход по малому квадрату
             {
                 for(int j1 = j - (j % 3); j1 < j - (j % 3) + 3; j1++)
                 {
@@ -120,11 +169,11 @@ void second(int i, int j,
                 }
                 if(flag == 1) break;
             }
-            if(flag == 0) // ������ � ��� ������ � ����� �������� ����� ��������� ������ �����
+            if(flag == 0) // только в эту клетку в малом квадрате можно поставить данное число
             {
                 m[i][j] = numb + 1;
                 (*summ)--;
-                first(i, j, numb, m, m1);
+                first(i, j, numb, m, m1, t);
                 return;
             }
         }
@@ -132,7 +181,7 @@ void second(int i, int j,
 }
 
 void part_of_third(int a1, int i1, int j1, int numb11, int numb21,
-                   vector <vector <vector<int> > > &m1)
+                   vector <vector <vector<bool> > > &m1)
 {
     if(a1 == 2)
     {
@@ -148,10 +197,10 @@ void part_of_third(int a1, int i1, int j1, int numb11, int numb21,
 }
 
 void third (vector <vector<int> > &m,
-            vector <vector <vector<int> > > &m1) // ������ ��������, ����� ������ �����
+            vector <vector <vector<bool> > > &m1) // третий алгоритм, хитро ставит флаги
 {
     int a = 0, i = 0, j = 0;
-    for(int x = 0; x < 9; x++) // �� �������
+    for(int x = 0; x < 9; x++) // по строкам
     {
         for(int numb1 = 0; numb1 < 9; numb1++)
         {
@@ -176,7 +225,7 @@ void third (vector <vector<int> > &m,
             }
         }
     }
-    for(int y = 0; y < 9; y++) // �� ��������
+    for(int y = 0; y < 9; y++) // по столбцам
     {
         for(int numb1 = 0; numb1 < 9; numb1++)
         {
@@ -201,7 +250,7 @@ void third (vector <vector<int> > &m,
             }
         }
     }
-    for(int X = 0; X < 3; X++) // �� ����� ���������
+    for(int X = 0; X < 3; X++) // по малым квадратам
     {
         for(int Y = 0; Y < 3; Y++)
         {
@@ -235,143 +284,82 @@ void third (vector <vector<int> > &m,
     }
 }
 
-void clue (vector <vector<int> > &f,
-           vector <vector <vector<int> > > &f1,
-           vector <thread> &thr,
-           int *deep,
-           int *summ)
+void correct (vector <vector<int> > &field) // проверяет, что в результате нет ошибок
 {
-    thr[*deep].i = -1;
-    for (int i = 0; i < 9; i++) //  �������� ����
-    {
-        for (int j = 0; j < 9; j++)
-        {
-            thr[*deep].arr[i][j] = f[i][j];
-        }
-    }
-    int cntr = 0;
-    for (int i = 0; i < 9; i++) // ���� ������, ���� ����� ��������� ������ ��� �����
-    {
-        for (int j = 0; j < 9; j++)
-        {
-            if (f[i][j] == 0)
-            {
-                for (int numb = 0; numb < 9; numb++)
-                {
-                    if (f1[i][j][numb] == 0) cntr++;
-                    if (cntr > 2) break;
-                }
-                if (cntr == 2) // ������ ��� ����� ���������� ������ � ������ f[i][j]
-                {
-                    thr[*deep].i = i;
-                    thr[*deep].j = j;
-                    break;
-                }
-                cntr = 0;
-            }
-        }
-        if (thr[*deep].i > -1) break;
-    }
-    bool one = 0;
-    if (thr[*deep].i > -1) // ������ ������ �����
+    bool flag = 1;
+    for (int i = 0; i < 9; i++) // провряем строки
     {
         for (int numb = 0; numb < 9; numb++)
         {
-            if (f1[thr[*deep].i][thr[*deep].j][numb] == 0)
-            {
-                if (one == 0) // ������ ������ �����
-                {
-                    f[thr[*deep].i][thr[*deep].j] = numb + 1;
-                    (*summ)--;
-                    first(thr[*deep].i, thr[*deep].j, numb, f, f1);
-                    one = 1;
-                    continue;
-                }
-                else // ������ ����������
-                {
-                    thr[*deep].numb = numb;
-                    break;
-                }
-            }
-        }
-        (*deep)++;
-        thr.resize(thr.size() + 1);
-    }
-    return;
-}
-
-void correct (vector <vector<int> > &field) // ���������, ��� � ���������� ��� ������
-{
-    bool flag = 0;
-    for (int i = 0; i < 9; i++) // �������� ������
-    {
-        for (int numb = 0; numb < 9; numb++)
-        {
-             int j = 0;
-             for (; j < 9; j++)
+             for (int j = 0; j < 9; j++)
              {
-                 if (field[i][j] == numb + 1) break;
+                 if (field[i][j] == numb + 1)
+                 {
+                     flag = 0;
+                     break;
+                 }
              }
-             if (field[i][j] != numb + 1)
+             if (flag)
              {
-                 flag = 1;
                  cout << "error1 on field" << endl;
                  return;
              }
+             flag = 1;
         }
-        if (flag) break;
     }
-    for (int i = 0; i < 9; i++) // ��������� �������
+    for (int i = 0; i < 9; i++) // проверяем столбцы
     {
         for (int numb = 0; numb < 9; numb++)
         {
-             int j = 0;
-             for (; j < 9; j++)
+             for (int j = 0; j < 9; j++)
              {
-                 if (field[j][i] == numb + 1) break;
+                 if (field[j][i] == numb + 1)
+                 {
+                     flag = 0;
+                     break;
+                 }
              }
-             if (field[j][i] != numb + 1)
+             if (flag)
              {
-                 flag = 1;
-                 cout << "error2 on field" << endl;
+                 cout << "error1 on field" << endl;
                  return;
              }
+             flag = 1;
         }
-        if (flag) break;
     }
-    for(int X = 0; X < 3; X++) // ��������� ����� ��������
+    for(int X = 0; X < 3; X++) // проверяем малые квадраты
     {
         for(int Y = 0; Y < 3; Y++)
         {
             for(int numb = 0; numb < 9; numb++)
             {
-                int x = 3 * X;
-                int y;
-                for(; x < 3 * (X + 1); x++)
+                for(int x = 3 * X; x < 3 * (X + 1); x++)
                 {
-                    for(y = 3 * Y; y < 3 * (Y + 1); y++)
+                    for(int y = 3 * Y; y < 3 * (Y + 1); y++)
                     {
-                        if (field[x][y] == numb + 1) break;
+                        if (field[x][y] == numb + 1)
+                        {
+                            flag = 0;
+                            break;
+                        }
                     }
-                    if (field[x][y] == numb + 1) break;
+                    if (flag == 0) break;
                 }
-                if (field[x][y] != numb + 1)
+                if (flag)
                 {
-                    flag = 1;
-                    cout << endl << "error3 on field " << field[x][y] << endl;
+                    cout << endl << "error3 on field " << endl;
                     return;
                 }
+                flag = 1;
             }
-            if (flag) break;
         }
-        if (flag) break;
     }
-    //if (flag == 0) cout << endl << "right field!" << endl;
+    cout << endl << "right field!" << endl;
     return;
 }
 
 bool good (vector <vector<int> > &field,
-           vector <vector <vector<int> > > &flag) // ��������� �����
+           vector <vector <vector<bool> > > &flag) // проверяем флаги
 {
     for (int i = 0; i < 9; i++)
     {
@@ -384,68 +372,28 @@ bool good (vector <vector<int> > &field,
                 {
                     if (flag[i][j][numb] == 1) cntr++;
                 }
-                if (cntr == 9) return 1; // � ������ ������ ��������� �� ���� �����, ������
+                if (cntr == 9) return 1; // в клетку нельзя поставить ни одно число, ошибка
             }
         }
     }
     return 0;
 }
 
-void ret_clue (vector <vector<int> > &f,
-               vector <vector <vector<int> > > &f1,
-               vector <thread> &thr,
-               int *deep,
-               int *summ)
-{
-     (*deep)--;
-     *summ = 81;
-     for (int i = 0; i < 9; i++) //  �������� �����
-     {
-        for (int j = 0; j < 9; j++)
-        {
-            for (int numb = 0; numb < 9; numb++)
-            {
-                f1[i][j][numb] = 0;
-            }
-        }
-     }
-     for (int i = 0; i < 9; i++) //  ���������� ����������� ���� � field
-     {
-        for (int j = 0; j < 9; j++)
-        {
-            f[i][j] = thr[*deep].arr[i][j];
-            if (f[i][j])  (*summ)--;
-        }
-     }
-     for (int i = 0; i < 9; i++) //  ���������� ����������� ���� � field
-     {
-        for (int j = 0; j < 9; j++)
-        {
-            if (f[i][j]) first (i, j, f[i][j] - 1, f, f1);
-        }
-     }
-
-     f[thr[*deep].i][thr[*deep].j] = thr[*deep].numb + 1; // ������ ������ ����������� ����� (������ �� ������� ��)
-     first(thr[*deep].i, thr[*deep].j, f[thr[*deep].i][thr[*deep].j] - 1, f, f1);
-     (*summ)--;
-     thr.resize(thr.size() - 1);
-     return;
-}
-
 void my_main (vector <vector<int> > &field,
               int summ,
-              bool test)
+              bool test,
+              int t)
 {
-    vector <vector <vector<int> > > flag (9, vector <vector <int> > (9, vector <int> (9))); // ������ ������ ����������� ��������� �����
+    vector <vector <vector<bool> > > flag (9, vector <vector <bool> > (9, vector <bool> (9))); // массив флагов возможности поставить цифру
     vector <thread> thr(1);
-    int circ = 0; // ������� ��� �������� �������� ����
-    int summ_prev = 0; // ���������� ������ ������ �� ���������� �������� ��������� �����
-    bool check = 0; // ����, ���������� � ������� ���� ������ ��������� ������� ����� � ������
+    int circ = 0; // сколько раз сработал основной цикл
+    int summ_prev = 0; // количество пустых клеток на предыдущей итерации основного цикла
+    bool check = 0; // флаг, обращается в единицу если нельзя поставить никакую цифру в клетку
     int deep = 0;
     int max_deep = 0;
     if (test == 0)
     {
-        for(int i = 0; i < 9; i++) // ���� ����-�������
+        for(int i = 0; i < 9; i++) // ввод поля-задания
         {
             for(int j = 0; j < 9; j++)
             {
@@ -453,47 +401,47 @@ void my_main (vector <vector<int> > &field,
                 if(field[i][j])
                 {
                     summ--;
-                    first(i, j, field[i][j] - 1, field, flag); // �� �������� ������ ����������� ����������� �������� ���������� ����� ����
+                    first(i, j, field[i][j] - 1, field, flag, t); // по исходным числам отбрасываем невозможные варианты постановки новых цифр
                 }
             }
         }
     }
-    for(int i = 0; i < 9; i++) // �� �������� ������ ����������� ����������� �������� ���������� ����� ����
+    for(int i = 0; i < 9; i++) // по исходным числам отбрасываем невозможные варианты постановки новых цифр
         {
             for(int j = 0; j < 9; j++)
             {
-                if(field[i][j]) first(i, j, field[i][j] - 1, field, flag);
+                if(field[i][j]) first(i, j, field[i][j] - 1, field, flag, t);
             }
         }
 
-    while(summ != 0 && circ != 100) // �������� ����
+    while(summ != 0 && circ != 100) // основной цикл
     {
         if (summ == summ_prev)
         {
-            clue (field, flag, thr, &deep, &summ);
+            clue (field, flag, thr, &deep, &summ, t);
             if (deep > max_deep) max_deep = deep;
         }
         summ_prev = summ;
-        for(int i = 0; i < 9; i++) // ������ �� ������ �������
+        for(int i = 0; i < 9; i++) // проход по пустым клеткам
         {
             for(int j = 0; j < 9; j++)
             {
-                if(field[i][j] == 0) second(i, j, &summ, field, flag);
+                if(field[i][j] == 0) second(i, j, &summ, field, flag, t);
             }
         }
         third(field, flag);
         check = good (field, flag);
-        if (check) // ����� ��������
+        if (check) // флаги неверные
         {
-            if (deep > 0) // ������ ���� ������� ����
+            if (deep > 0) // значит надо смотать нить
             {
-                ret_clue (field, flag, thr, &deep, &summ);
+                ret_clue (field, flag, thr, &deep, &summ, t);
             }
-            else break; // ���� ���� �� �����������, ������ ������
+            else break; // если нить не разматывали, значит ошибка
         }
         circ++;
     }
-    /*for (int i = 0; i < 9; i++) //����� ������ ����������� ��������� �����
+    /*for (int i = 0; i < 9; i++) //вывод флагов возможности поставить числа
     {
         for(int j = 0; j < 9; j++)
         {
@@ -517,7 +465,7 @@ void my_main (vector <vector<int> > &field,
     }
     correct (field);
     cout << endl;
-    for (int i = 0; i < 9; i++) // ����� ��������� ����
+    for (int i = 0; i < 9; i++) // вывод ответного поля
     {
         for(int j = 0; j < 9; j++)
         {
@@ -527,18 +475,18 @@ void my_main (vector <vector<int> > &field,
         }
         cout << endl;
     }
-    cout << "Difficult: " << circ << endl; // ����� ��������� �������
+    cout << "Difficult: " << circ << endl; // вывод сложности задания
     cout << "Depth of Ariadne's thread: " << max_deep << endl;
    // cout << summ << endl;
 }
 
 
 
-void unit_test (vector <vector<int> > &field,
+/*void unit_test (vector <vector<int> > &field,
                 int summ,
                 FILE *fin)
 {
-    for(int i = 0; i < 9; i++) // ���� ����-�������
+    for(int i = 0; i < 9; i++) // ввод поля-задания
     {
         for(int j = 0; j < 9; j++)
         {
@@ -547,7 +495,7 @@ void unit_test (vector <vector<int> > &field,
         }
     }
     fclose (fin);
-    for (int i = 0; i < 9; i++) // ����� ��������� �������
+    for (int i = 0; i < 9; i++) // вывод тестового задания
     {
         for(int j = 0; j < 9; j++)
         {
@@ -558,12 +506,13 @@ void unit_test (vector <vector<int> > &field,
         cout << endl;
     }
     my_main (field, summ, 1);
-}
+}*/
 
 int main(int argc, char **argv)
 {
-    vector <vector<int> > field (9, vector <int> (9)); // ���� ������
+    vector <vector<int> > field (9, vector <int> (9)); // поле судоку
     int summ = 81;
+    int type = 0;
 
    /*if (!strncmp(argv[1], "test", sizeof("test")))
     {
@@ -574,14 +523,22 @@ int main(int argc, char **argv)
         fin = fopen("test2.txt", "r");
         unit_test (field, summ, fin);
         cout << endl << endl << endl << "TEST3" << endl;
-        fin = fopen("test3.txt", "r");
+        FILE *fin = fopen("hard_diag_sudoku.txt", "r");
         unit_test (field, summ, fin);
         cout << endl << endl << endl;
-    }*/
+    //}*/
     char flag = 'y';
     while (flag == 'y')
     {
-        my_main (field, summ, 0);
+        cout << "Welcome. For standart sudoku enter 0, for diagonal sudoku enter 1, for windoku enter 2: ";
+        cin >> type;
+        while (type < 0 || type > 2)
+        {
+            cout << "You take mistake. Repeat, please: ";
+            cin >> type;
+        }
+        cout << "Enter field-task, please" << endl;
+        my_main (field, summ, 0, type);
         cout << "Do you want solve new sudoku? (y/n)" << endl;
         cin >> flag;
     }
