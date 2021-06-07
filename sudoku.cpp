@@ -6,6 +6,21 @@
 
 using namespace std;
 
+class thread
+{
+    public:
+    int i;
+    int j;
+    int numb;
+    vector <vector<int> > arr;
+
+    thread ()
+    {
+        arr.resize(9);
+        for (unsigned i = 0; i < arr.size(); i++) arr[i].resize(9);
+    }
+};
+
 void first(int i, int j,
            int numb,
            vector <vector<int> > &m,
@@ -222,18 +237,20 @@ void third (vector <vector<int> > &m,
 
 void clue (vector <vector<int> > &f,
            vector <vector <vector<int> > > &f1,
-           vector <vector <vector<int> > > &cl,
-           int *summ, int *clue_i, int *clue_j, int *clue_numb)
+           vector <thread> &thr,
+           int *deep,
+           int *summ)
 {
+    thr[*deep].i = -1;
     for (int i = 0; i < 9; i++) //  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     {
         for (int j = 0; j < 9; j++)
         {
-            cl[0][i][j] = f[i][j];
+            thr[*deep].arr[i][j] = f[i][j];
         }
     }
     int cntr = 0;
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 9; i++) // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
     {
         for (int j = 0; j < 9; j++)
         {
@@ -246,37 +263,39 @@ void clue (vector <vector<int> > &f,
                 }
                 if (cntr == 2) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ f[i][j]
                 {
-                    *clue_i = i;
-                    *clue_j = j;
+                    thr[*deep].i = i;
+                    thr[*deep].j = j;
                     break;
                 }
                 cntr = 0;
             }
         }
-        if (*clue_i > -1) break;
+        if (thr[*deep].i > -1) break;
     }
     bool one = 0;
-    if (*clue_i > -1)
+    if (thr[*deep].i > -1) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
     {
         for (int numb = 0; numb < 9; numb++)
         {
-            if (f1[*clue_i][*clue_j][numb] == 0)
+            if (f1[thr[*deep].i][thr[*deep].j][numb] == 0)
             {
                 if (one == 0) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
                 {
-                    f[*clue_i][*clue_j] = numb + 1;
+                    f[thr[*deep].i][thr[*deep].j] = numb + 1;
                     (*summ)--;
-                    first(*clue_i, *clue_j, numb, f, f1);
+                    first(thr[*deep].i, thr[*deep].j, numb, f, f1);
                     one = 1;
                     continue;
                 }
                 else // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 {
-                    *clue_numb = numb;
-                    return;
+                    thr[*deep].numb = numb;
+                    break;
                 }
             }
         }
+        (*deep)++;
+        thr.resize(thr.size() + 1);
     }
     return;
 }
@@ -284,7 +303,7 @@ void clue (vector <vector<int> > &f,
 void correct (vector <vector<int> > &field) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 {
     bool flag = 0;
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 9; i++) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     {
         for (int numb = 0; numb < 9; numb++)
         {
@@ -302,7 +321,7 @@ void correct (vector <vector<int> > &field) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï
         }
         if (flag) break;
     }
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 9; i++) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     {
         for (int numb = 0; numb < 9; numb++)
         {
@@ -320,7 +339,7 @@ void correct (vector <vector<int> > &field) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï
         }
         if (flag) break;
     }
-    for(int X = 0; X < 3; X++) // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    for(int X = 0; X < 3; X++) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     {
         for(int Y = 0; Y < 3; Y++)
         {
@@ -347,12 +366,12 @@ void correct (vector <vector<int> > &field) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï
         }
         if (flag) break;
     }
-    if (flag == 0) cout << endl << "right field!" << endl;
+    //if (flag == 0) cout << endl << "right field!" << endl;
     return;
 }
 
 bool good (vector <vector<int> > &field,
-           vector <vector <vector<int> > > &flag)
+           vector <vector <vector<int> > > &flag) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
 {
     for (int i = 0; i < 9; i++)
     {
@@ -365,7 +384,7 @@ bool good (vector <vector<int> > &field,
                 {
                     if (flag[i][j][numb] == 1) cntr++;
                 }
-                if (cntr == 9) return 1;
+                if (cntr == 9) return 1; // ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             }
         }
     }
@@ -374,11 +393,13 @@ bool good (vector <vector<int> > &field,
 
 void ret_clue (vector <vector<int> > &f,
                vector <vector <vector<int> > > &f1,
-               vector <vector <vector<int> > > &cl,
-               int *summ, int clue_i, int clue_j, int clue_numb)
+               vector <thread> &thr,
+               int *deep,
+               int *summ)
 {
+     (*deep)--;
      *summ = 81;
-     for (int i = 0; i < 9; i++) //  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+     for (int i = 0; i < 9; i++) //  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
      {
         for (int j = 0; j < 9; j++)
         {
@@ -388,21 +409,26 @@ void ret_clue (vector <vector<int> > &f,
             }
         }
      }
-     for (int i = 0; i < 9; i++) //  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+     for (int i = 0; i < 9; i++) //  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ field
      {
         for (int j = 0; j < 9; j++)
         {
-            f[i][j] = cl[0][i][j];
-            if (f[i][j])
-            {
-                (*summ)--;
-                first(i, j, f[i][j] - 1, f, f1);
-            }
+            f[i][j] = thr[*deep].arr[i][j];
+            if (f[i][j])  (*summ)--;
         }
      }
-     f[clue_i][clue_j] = clue_numb + 1;
-     first(clue_i, clue_j, f[clue_i][clue_j] - 1, f, f1);
+     for (int i = 0; i < 9; i++) //  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ field
+     {
+        for (int j = 0; j < 9; j++)
+        {
+            if (f[i][j]) first (i, j, f[i][j] - 1, f, f1);
+        }
+     }
+
+     f[thr[*deep].i][thr[*deep].j] = thr[*deep].numb + 1; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½)
+     first(thr[*deep].i, thr[*deep].j, f[thr[*deep].i][thr[*deep].j] - 1, f, f1);
      (*summ)--;
+     thr.resize(thr.size() - 1);
      return;
 }
 
@@ -411,12 +437,12 @@ void my_main (vector <vector<int> > &field,
               bool test)
 {
     vector <vector <vector<int> > > flag (9, vector <vector <int> > (9, vector <int> (9))); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
-    vector <vector <vector<int> > > clue_arr (1, vector <vector <int> > (9, vector <int> (9)));
+    vector <thread> thr(1);
     int circ = 0; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     int summ_prev = 0; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
     bool check = 0; // ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-    bool clue_flag = 0; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-    int clue_i = -1, clue_j = -1, clue_numb = -1;
+    int deep = 0;
+    int max_deep = 0;
     if (test == 0)
     {
         for(int i = 0; i < 9; i++) // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
@@ -432,24 +458,20 @@ void my_main (vector <vector<int> > &field,
             }
         }
     }
-
-    while(summ != 0 && circ != 20) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-    {
-        for(int i = 0; i < 9; i++) // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    for(int i = 0; i < 9; i++) // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         {
             for(int j = 0; j < 9; j++)
             {
                 if(field[i][j]) first(i, j, field[i][j] - 1, field, flag);
             }
         }
-        if (summ == summ_prev && clue_flag == 0)
+
+    while(summ != 0 && circ != 100) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    {
+        if (summ == summ_prev)
         {
-            clue (field, flag, clue_arr, &summ, &clue_i, &clue_j, &clue_numb);
-            if (clue_i > -1)
-            {
-                clue_flag = 1;
-                cout << "I used Ariadne's thread!" << endl;
-            }
+            clue (field, flag, thr, &deep, &summ);
+            if (deep > max_deep) max_deep = deep;
         }
         summ_prev = summ;
         for(int i = 0; i < 9; i++) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
@@ -461,15 +483,13 @@ void my_main (vector <vector<int> > &field,
         }
         third(field, flag);
         check = good (field, flag);
-        if (check)
+        if (check) // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         {
-            if (clue_flag)
+            if (deep > 0) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             {
-                ret_clue (field, flag, clue_arr, &summ, clue_i, clue_j, clue_numb);
-                clue_i = clue_j = clue_numb = -1;
-                clue_flag = 0;
+                ret_clue (field, flag, thr, &deep, &summ);
             }
-            else break;
+            else break; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         }
         circ++;
     }
@@ -491,11 +511,12 @@ void my_main (vector <vector<int> > &field,
     {
         cout << "error in flags" << endl;
     }
-    if (summ == summ_prev)
+    if (summ == summ_prev && summ != 0)
     {
         cout << "Not solved" << endl;
     }
     correct (field);
+    cout << endl;
     for (int i = 0; i < 9; i++) // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     {
         for(int j = 0; j < 9; j++)
@@ -506,7 +527,8 @@ void my_main (vector <vector<int> > &field,
         }
         cout << endl;
     }
-    cout << "How many time work main while: " << circ << endl;
+    cout << "Difficult: " << circ << endl; // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    cout << "Depth of Ariadne's thread: " << max_deep << endl;
    // cout << summ << endl;
 }
 
@@ -556,7 +578,12 @@ int main(int argc, char **argv)
         unit_test (field, summ, fin);
         cout << endl << endl << endl;
     }*/
-
-    my_main (field, summ, 0);
+    char flag = 'y';
+    while (flag == 'y')
+    {
+        my_main (field, summ, 0);
+        cout << "Do you want solve new sudoku? (y/n)" << endl;
+        cin >> flag;
+    }
     return 0;
 }
