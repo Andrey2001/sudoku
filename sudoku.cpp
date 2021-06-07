@@ -1,113 +1,116 @@
 #include <iostream>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
 
-extern "C" FILE *fopen(const char*, const char*);
-extern "C" char *fscanf(FILE*, const char*, ...);
-extern "C" char *fclose (FILE*);
-
 using namespace std;
 
-void first(int x, int y,
+void first(int i, int j,
            int numb,
            vector <vector<int> > &m,
-           vector <vector <vector<int> > > &m1) // первый алгоритм, ставит только флаги
+           vector <vector <vector<int> > > &m1) // ������ ��������, ������ ������ �����
 {
-    for(int x1 = 0; x1 < 9; x1++) // по строке
+    for(int i1 = 0; i1 < 9; i1++) // ������ �� �������
     {
-        if(m[x1][y] == 0 && m1[x1][y][numb] == 0) m1[x1][y][numb] = 1;
+        if(m[i1][j] == 0 && m1[i1][j][numb] == 0) m1[i1][j][numb] = 1;
     }
-    for(int y1 = 0; y1 < 9; y1++) // по столбцу
+    for(int j1 = 0; j1 < 9; j1++) // ������ �� ������
     {
-        if(m[x][y1] == 0 && m1[x][y1][numb] == 0) m1[x][y1][numb] = 1;
+        if(m[i][j1] == 0 && m1[i][j1][numb] == 0) m1[i][j1][numb] = 1;
     }
-    for(int y1 = y / 3 * 3; y1 < (y / 3 * 3) + 3; y1++) // по малому квадрату
+    for(int i1 = i - (i % 3); i1 < i - (i % 3) + 3; i1++) // ������ �� ������ ��������
     {
-        for(int x1 = x / 3 * 3; x1 < (x / 3 * 3) + 3; x1++)
+        for(int j1 = j - (j % 3); j1 < j - (j % 3) + 3; j1++)
         {
-            if(m[x1][y1] == 0 && m1[x1][y1][numb] == 0) m1[x1][y1][numb] = 1;
+            if(m[i1][j1] == 0 && m1[i1][j1][numb] == 0) m1[i1][j1][numb] = 1;
         }
     }
 }
 
-void second(int x, int y,
+void second(int i, int j,
             int *summ,
             vector <vector<int> > &m,
-            vector <vector <vector<int> > > &m1) // второй алгоритм ставит числа
+            vector <vector <vector<int> > > &m1) // ������ �������� ������ �����
 {
     int a = 0;
     for(int numb = 0; numb < 9; numb++)
     {
-        if(m1[x][y][numb] == 1) a++;
+        if(m1[i][j][numb] == 1) a++;
     }
-    if(a == 8) // по цифрам
+    if(a == 8) // �� ������, ������ ���� ����� ����� ��������� � ������
     {
         for(int numb = 0; numb < 9; numb++)
         {
-            if(m1[x][y][numb] == 0)
+            if(m1[i][j][numb] == 0)
             {
-                m[x][y] = numb + 1;
+                m[i][j] = numb + 1;
                 (*summ)--;
-                first(x, y, numb, m, m1);
+                first(i, j, numb, m, m1);
                 a = 0;
-                break;
+                return;
             }
         }
     }
+
     for(int numb = 0; numb < 9; numb++)
     {
-        if(m[x][y] == 0 && m1[x][y][numb] == 0)
+        if(m[i][j] == 0 && m1[i][j][numb] == 0)
         {
-            int x1 = 0, f1 = 0; // по строке
-            for(; x1 < 9; x1++)
+            bool flag = 0;
+            for(int i1 = 0; i1 < 9; i1++) // �� ������
             {
-                if(m1[x1][y][numb] == 0 && m[x1][y] == 0 && x1 != x); f1++;
-            }
-            if(f1 == 0)
-            {
-                m[x][y] = numb + 1;
-                (*summ)--;
-                first(x, y, numb, m, m1);
-                break;
-            }
-            else // по столбцу
-            {
-                int y1 = 0, f2 = 0;
-                for(; y1 < 9; y1++)
+                if(m1[i1][j][numb] == 0 && m[i1][j] == 0 && i1 != i)
                 {
-                    if(m1[x][y1][numb] == 0 && m[x][y1] == 0 && y1 != y) f2++;
-                }
-                if(f2 == 0)
-                {
-                    m[x][y] = numb + 1;
-                    (*summ)--;
-                    first(x, y, numb, m, m1);
+                    flag = 1;
                     break;
                 }
-                else // по малому квадрату
+            }
+            if(flag == 0) // ������ � ��� ������ � ������� ����� ��������� ������ �����
+            {
+                m[i][j] = numb + 1;
+                (*summ)--;
+                first(i, j, numb, m, m1);
+                return;
+            }
+
+            flag = 0;
+            for(int j1 = 0; j1 < 9; j1++) // �� ������
+            {
+                if(m1[i][j1][numb] == 0 && m[i][j1] == 0 && j1 != j)
                 {
-                    int f3 = 0;
-                    for(int y2 = y / 3 * 3; y2 < (y / 3 * 3) + 3; y2++)
+                    flag = 1;
+                    break;
+                }
+            }
+            if(flag == 0) // ������ � ��� ������ � ������ ����� ��������� ������ �����
+            {
+                m[i][j] = numb + 1;
+                (*summ)--;
+                first(i, j, numb, m, m1);
+                return;
+            }
+
+
+            flag = 0;
+            for(int i1 = i - (i % 3); i1 < i - (i % 3) + 3; i1++) // ������ �� ������ ��������
+            {
+                for(int j1 = j - (j % 3); j1 < j - (j % 3) + 3; j1++)
+                {
+                    if(m1[i1][j1][numb] == 0 && m[i1][j1] == 0 && (i1 != 1 || j1 != j))
                     {
-                        for(int x2 = x / 3 * 3; x2 < (x / 3 * 3) + 3; x2++)
-                        {
-                            if(m1[x2][y2][numb] == 0 && m[x2][y2] == 0 && (x2 != x || y2 != y))
-                            {
-                                f3++;
-                                break;
-                            }
-                        }
-                        if(f3 == 1) break;
-                    }
-                    if(f3 == 0)
-                    {
-                        m[x][y] = numb + 1;
-                        (*summ)--;
-                        first(x, y, numb, m, m1);
+                        flag = 1;
                         break;
                     }
                 }
+                if(flag == 1) break;
+            }
+            if(flag == 0) // ������ � ��� ������ � ����� �������� ����� ��������� ������ �����
+            {
+                m[i][j] = numb + 1;
+                (*summ)--;
+                first(i, j, numb, m, m1);
+                return;
             }
         }
     }
@@ -130,10 +133,10 @@ void part_of_third(int a1, int i1, int j1, int numb11, int numb21,
 }
 
 void third (vector <vector<int> > &m,
-            vector <vector <vector<int> > > &m1) // третий алгоритм, хитро ставит флаги
+            vector <vector <vector<int> > > &m1) // ������ ��������, ����� ������ �����
 {
     int a = 0, i = 0, j = 0;
-    for(int x = 0; x < 9; x++) // по столбцам
+    for(int x = 0; x < 9; x++) // �� �������
     {
         for(int numb1 = 0; numb1 < 9; numb1++)
         {
@@ -158,7 +161,7 @@ void third (vector <vector<int> > &m,
             }
         }
     }
-    for(int y = 0; y < 9; y++) // по строкам
+    for(int y = 0; y < 9; y++) // �� ��������
     {
         for(int numb1 = 0; numb1 < 9; numb1++)
         {
@@ -183,7 +186,7 @@ void third (vector <vector<int> > &m,
             }
         }
     }
-    for(int X = 0; X < 3; X++) // по малым квадратам
+    for(int X = 0; X < 3; X++) // �� ����� ���������
     {
         for(int Y = 0; Y < 3; Y++)
         {
@@ -217,14 +220,70 @@ void third (vector <vector<int> > &m,
     }
 }
 
-/*void clue (vector <vector<int> > &f, vector <vector <vector<int> > > &f1, vector <vector <vector <vector<int> > > > &cl)
+void clue (vector <vector<int> > &f,
+           vector <vector <vector<int> > > &f1,
+           vector <vector <vector<int> > > &cl,
+           int *summ, int *clue_i, int *clue_j, int *clue_numb)
 {
-    for (int i = 0; i < 9; i)
-}*/
+    for (int i = 0; i < 9; i++) //  �������� ����
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            cl[0][i][j] = f[i][j];
+        }
+    }
+    int cntr = 0;
+    for (int i = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            if (f[i][j] == 0)
+            {
+                for (int numb = 0; numb < 9; numb++)
+                {
+                    if (f1[i][j][numb] == 0) cntr++;
+                    if (cntr > 2) break;
+                }
+                if (cntr == 2) // ������ ��� ����� ���������� ������ � ������ f[i][j]
+                {
+                    *clue_i = i;
+                    *clue_j = j;
+                    break;
+                }
+                cntr = 0;
+            }
+        }
+        if (*clue_i > -1) break;
+    }
+    bool one = 0;
+    if (*clue_i > -1)
+    {
+        for (int numb = 0; numb < 9; numb++)
+        {
+            if (f1[*clue_i][*clue_j][numb] == 0)
+            {
+                if (one == 0) // ������ ������ �����
+                {
+                    f[*clue_i][*clue_j] = numb + 1;
+                    (*summ)--;
+                    first(*clue_i, *clue_j, numb, f, f1);
+                    one = 1;
+                    continue;
+                }
+                else // ������ ����������
+                {
+                    *clue_numb = numb;
+                    return;
+                }
+            }
+        }
+    }
+    return;
+}
 
-void correct (vector <vector<int> > &field) // проверяет, что в результате нет ошибок
+void correct (vector <vector<int> > &field) // ���������, ��� � ���������� ��� ������
 {
-    bool flag;
+    bool flag = 0;
     for (int i = 0; i < 9; i++)
     {
         for (int numb = 0; numb < 9; numb++)
@@ -238,7 +297,7 @@ void correct (vector <vector<int> > &field) // проверяет, что в р�
              {
                  flag = 1;
                  cout << "error1 on field" << endl;
-                 break;
+                 return;
              }
         }
         if (flag) break;
@@ -256,12 +315,12 @@ void correct (vector <vector<int> > &field) // проверяет, что в р�
              {
                  flag = 1;
                  cout << "error2 on field" << endl;
-                 break;
+                 return;
              }
         }
         if (flag) break;
     }
-    for(int X = 0; X < 3; X++) // по малым квадратам
+    for(int X = 0; X < 3; X++) // �� ����� ���������
     {
         for(int Y = 0; Y < 3; Y++)
         {
@@ -281,78 +340,146 @@ void correct (vector <vector<int> > &field) // проверяет, что в р�
                 {
                     flag = 1;
                     cout << endl << "error3 on field " << field[x][y] << endl;
-                    break;
+                    return;
                 }
             }
             if (flag) break;
         }
         if (flag) break;
     }
-    if (flag == 0) cout << "right field!" << endl;
+    if (flag == 0) cout << endl << "right field!" << endl;
+    return;
+}
+
+bool good (vector <vector<int> > &field,
+           vector <vector <vector<int> > > &flag)
+{
+    for (int i = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            if (field[i][j] == 0)
+            {
+                int cntr = 0;
+                for (int numb = 0; numb < 9; numb++)
+                {
+                    if (flag[i][j][numb] == 1) cntr++;
+                }
+                if (cntr == 9) return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+void ret_clue (vector <vector<int> > &f,
+               vector <vector <vector<int> > > &f1,
+               vector <vector <vector<int> > > &cl,
+               int *summ, int clue_i, int clue_j, int clue_numb)
+{
+     *summ = 81;
+     for (int i = 0; i < 9; i++) //  �������� ����
+     {
+        for (int j = 0; j < 9; j++)
+        {
+            for (int numb = 0; numb < 9; numb++)
+            {
+                f1[i][j][numb] = 0;
+            }
+        }
+     }
+     for (int i = 0; i < 9; i++) //  �������� ����
+     {
+        for (int j = 0; j < 9; j++)
+        {
+            f[i][j] = cl[0][i][j];
+            if (f[i][j])
+            {
+                (*summ)--;
+                first(i, j, f[i][j] - 1, f, f1);
+            }
+        }
+     }
+     f[clue_i][clue_j] = clue_numb + 1;
+     first(clue_i, clue_j, f[clue_i][clue_j] - 1, f, f1);
+     (*summ)--;
+     return;
 }
 
 void my_main (vector <vector<int> > &field,
               int summ,
               bool test)
 {
-    vector <vector <vector<int> > > flag (9, vector <vector <int> > (9, vector <int> (9))); // массив флагов возможности поставить цифру
-    vector <vector <vector <vector<int> > > > clue_arr (1, vector <vector <vector<int> > > (9, vector <vector <int> > (9, vector <int> (9))));
-    int circ = 0; // сколько раз сработал основной цикл
-    int summ_prev = 0; // количество пустых клеток на предыдущей итерации основного цикла
-    bool check = 0; // флаг, обращается в единицу если нельзя поставить никакую цифру в клетку
-    bool clue_flag = 0; // использовалась нить Ариадны
+    vector <vector <vector<int> > > flag (9, vector <vector <int> > (9, vector <int> (9))); // ������ ������ ����������� ��������� �����
+    vector <vector <vector<int> > > clue_arr (1, vector <vector <int> > (9, vector <int> (9)));
+    int circ = 0; // ������� ��� �������� �������� ����
+    int summ_prev = 0; // ���������� ������ ������ �� ���������� �������� ��������� �����
+    bool check = 0; // ����, ���������� � ������� ���� ������ ��������� ������� ����� � ������
+    bool clue_flag = 0; // �������������� ���� �������
+    int clue_i = -1, clue_j = -1, clue_numb = -1;
     if (test == 0)
     {
-        for(int j = 0; j < 9; j++) // ввод поля-задания
+        for(int i = 0; i < 9; i++) // ���� ����-�������
         {
-            for(int i = 0; i < 9; i++)
+            for(int j = 0; j < 9; j++)
             {
                 cin >> field[i][j];
-                if(field[i][j] != 0)  summ--;
+                if(field[i][j])
+                {
+                    summ--;
+                    first(i, j, field[i][j] - 1, field, flag); // �� �������� ������ ����������� ����������� �������� ���������� ����� ����
+                }
             }
         }
     }
 
-    for(int y = 0; y < 9; y++) // по исходным числам отбрасываем невозможные варианты постановки новых цифр
+    while(summ != 0 && circ != 20) // �������� ����
     {
-        for(int x = 0; x < 9; x++)
+        for(int i = 0; i < 9; i++) // �� �������� ������ ����������� ����������� �������� ���������� ����� ����
         {
-            if(field[x][y]) first(x, y, field[x][y] - 1, field, flag);
-        }
-    }
-    while(summ != 0) // основной цикл
-    {
-        /*if (summ == summ_prev)
-        {
-            clue (field, flag, clue_arr);
-        }*/
-        summ_prev = summ;
-        for(int y = 0; y < 9; y++)
-        {
-            for(int x = 0; x < 9; x++)
+            for(int j = 0; j < 9; j++)
             {
-                if(field[x][y] == 0) second(x, y, &summ, field, flag);
+                if(field[i][j]) first(i, j, field[i][j] - 1, field, flag);
+            }
+        }
+        if (summ == summ_prev && clue_flag == 0)
+        {
+            clue (field, flag, clue_arr, &summ, &clue_i, &clue_j, &clue_numb);
+            if (clue_i > -1)
+            {
+                clue_flag = 1;
+                cout << "I used Ariadne's thread!" << endl;
+            }
+        }
+        summ_prev = summ;
+        for(int i = 0; i < 9; i++) // ������ �� ������ �������
+        {
+            for(int j = 0; j < 9; j++)
+            {
+                if(field[i][j] == 0) second(i, j, &summ, field, flag);
             }
         }
         third(field, flag);
-        /*check = good (field, flag);
-        if (check && clue_flag == 0)
+        check = good (field, flag);
+        if (check)
         {
             if (clue_flag)
             {
-                ret_clue (field,)
+                ret_clue (field, flag, clue_arr, &summ, clue_i, clue_j, clue_numb);
+                clue_i = clue_j = clue_numb = -1;
+                clue_flag = 0;
             }
             else break;
-        }*/
+        }
         circ++;
     }
-    /*for (int i = 1; i < 10; i++) вывод флагов возможности поставить числа
+    /*for (int i = 0; i < 9; i++) //����� ������ ����������� ��������� �����
     {
         for(int j = 0; j < 9; j++)
         {
             for(int k = 0; k < 9; k++)
             {
-                cout << m1[k][j][i] << " ";
+                cout << flag[j][k][i] << " ";
             }
             cout << endl;
         }
@@ -369,13 +496,13 @@ void my_main (vector <vector<int> > &field,
         cout << "Not solved" << endl;
     }
     correct (field);
-    for (int j = 0; j < 9; j++) // вывод ответного поля
+    for (int i = 0; i < 9; i++) // ����� ��������� ����
     {
-        for(int i = 0; i < 9; i++)
+        for(int j = 0; j < 9; j++)
         {
             cout << field[i][j] << " ";
-            if(i % 3 == 2) cout << " ";
-            if(j % 3 == 2 && i == 8) cout << endl;
+            if(j % 3 == 2) cout << " ";
+            if(i % 3 == 2 && j == 8) cout << endl;
         }
         cout << endl;
     }
@@ -389,42 +516,46 @@ void unit_test (vector <vector<int> > &field,
                 int summ,
                 FILE *fin)
 {
-    for(int j = 0; j < 9; j++) // ввод поля-задания
+    for(int i = 0; i < 9; i++) // ���� ����-�������
     {
-        for(int i = 0; i < 9; i++)
+        for(int j = 0; j < 9; j++)
         {
             fscanf (fin, "%d", &field[i][j]);
             if(field[i][j] != 0)  summ--;
         }
     }
     fclose (fin);
-    for (int j = 0; j < 9; j++) // вывод тестового задания
+    for (int i = 0; i < 9; i++) // ����� ��������� �������
     {
-        for(int i = 0; i < 9; i++)
+        for(int j = 0; j < 9; j++)
         {
             cout << field[i][j] << " ";
-            if(i % 3 == 2) cout << " ";
-            if(j % 3 == 2 && i == 8) cout << endl;
+            if(j % 3 == 2) cout << " ";
+            if(i % 3 == 2 && j == 8) cout << endl;
         }
         cout << endl;
     }
     my_main (field, summ, 1);
 }
 
-int main()
+int main(int argc, char **argv)
 {
-    vector <vector<int> > field (9, vector <int> (9)); // поле судоку
+    vector <vector<int> > field (9, vector <int> (9)); // ���� ������
     int summ = 81;
-    cout << "TEST1" << endl;
-    FILE *fin = fopen("test1.txt", "r");
-    unit_test (field, summ, fin);
-    cout << endl << endl << endl << "TEST2" << endl;
-    fin = fopen("test2.txt", "r");
-    unit_test (field, summ, fin);
-    cout << endl << endl << endl << "TEST3" << endl;
-    fin = fopen("test3.txt", "r");
-    unit_test (field, summ, fin);
-    cout << endl << endl << endl << "Please, write your task:" << endl;
+
+   /*if (!strncmp(argv[1], "test", sizeof("test")))
+    {
+        cout << "TEST1" << endl;
+        FILE *fin = fopen("test1.txt", "r");
+        unit_test (field, summ, fin);
+        cout << endl << endl << endl << "TEST2" << endl;
+        fin = fopen("test2.txt", "r");
+        unit_test (field, summ, fin);
+        cout << endl << endl << endl << "TEST3" << endl;
+        fin = fopen("test3.txt", "r");
+        unit_test (field, summ, fin);
+        cout << endl << endl << endl;
+    }*/
 
     my_main (field, summ, 0);
     return 0;
