@@ -1,21 +1,20 @@
 #include <iostream>
 #include <string.h>
+#include <vector>
 
 using namespace std;
 
-int m[9][9], m1[9][9][10], w = 0, summ = 81, b = 0;
-
-void first(int x, int y, int numb) // первый алгоритм
+void first(int x, int y, int numb, vector <vector<int> > &m, vector <vector <vector<int> > > &m1) // ������ ��������, ������ ������ �����
 {
-    for(int x1 = 0; x1 < 9; x1++) // по строке
+    for(int x1 = 0; x1 < 9; x1++) // �� ������
     {
         if(m[x1][y] == 0 && m1[x1][y][numb] == 0) m1[x1][y][numb] = 1;
     }
-    for(int y1 = 0; y1 < 9; y1++) // по столбцу
+    for(int y1 = 0; y1 < 9; y1++) // �� �������
     {
         if(m[x][y1] == 0 && m1[x][y1][numb] == 0) m1[x][y1][numb] = 1;
     }
-    for(int y1 = y / 3 * 3; y1 < (y / 3 * 3) + 3; y1++) // по малому квадрату
+    for(int y1 = y / 3 * 3; y1 < (y / 3 * 3) + 3; y1++) // �� ������ ��������
     {
         for(int x1 = x / 3 * 3; x1 < (x / 3 * 3) + 3; x1++)
         {
@@ -24,22 +23,22 @@ void first(int x, int y, int numb) // первый алгоритм
     }
 }
 
-void second(int x,int y) // второй алгоритм
+void second(int x, int y, int *summ, vector <vector<int> > &m, vector <vector <vector<int> > > &m1) // ������ �������� ������ �����
 {
     int a = 0;
     for(int numb = 1; numb < 10; numb++)
     {
         if(m1[x][y][numb] == 1) a++;
     }
-    if(a == 8) // по цифрам
+    if(a == 8) // �� ������
     {
         for(int numb = 1; numb < 10; numb++)
         {
             if(m1[x][y][numb] == 0)
             {
                 m[x][y] = numb;
-                summ--;
-                first(x, y, numb);
+                (*summ)--;
+                first(x, y, numb, m, m1);
                 a = 0;
                 break;
             }
@@ -49,7 +48,7 @@ void second(int x,int y) // второй алгоритм
     {
         if(m[x][y] == 0 && m1[x][y][numb] == 0)
         {
-            int x1 = 0, f1 = 0; // по строке
+            int x1 = 0, f1 = 0; // �� ������
             for(; x1 < 9; x1++)
             {
                 if(m1[x1][y][numb] == 0 && m[x1][y] == 0 && x1 != x); f1++;
@@ -57,11 +56,11 @@ void second(int x,int y) // второй алгоритм
             if(f1 == 0)
             {
                 m[x][y] = numb;
-                summ--;
-                first(x, y, numb);
+                (*summ)--;
+                first(x, y, numb, m, m1);
                 break;
             }
-            else // по столбцу
+            else // �� �������
             {
                 int y1 = 0, f2 = 0;
                 for(; y1 < 9; y1++)
@@ -71,11 +70,11 @@ void second(int x,int y) // второй алгоритм
                 if(f2 == 0)
                 {
                     m[x][y] = numb;
-                    summ--;
-                    first(x, y, numb);
+                    (*summ)--;
+                    first(x, y, numb, m, m1);
                     break;
                 }
-                else // по малому квадрату
+                else // �� ������ ��������
                 {
                     int f3 = 0;
                     for(int y2 = y / 3 * 3; y2 < (y / 3 * 3) + 3; y2++)
@@ -93,8 +92,8 @@ void second(int x,int y) // второй алгоритм
                     if(f3 == 0)
                     {
                         m[x][y] = numb;
-                        summ--;
-                        first(x, y, numb);
+                        (*summ)--;
+                        first(x, y, numb, m, m1);
                         break;
                     }
                 }
@@ -103,7 +102,7 @@ void second(int x,int y) // второй алгоритм
     }
 }
 
-void part_of_third(int a1,int i1, int j1, int numb11, int numb21)
+void part_of_third(int a1,int i1, int j1, int numb11, int numb21, vector <vector <vector<int> > > &m1)
 {
     if(a1 == 2)
     {
@@ -118,10 +117,10 @@ void part_of_third(int a1,int i1, int j1, int numb11, int numb21)
     }
 }
 
-void third() // третий алгоритм
+void third (vector <vector<int> > &m, vector <vector <vector<int> > > &m1) // ������ ��������, ����� ������ �����
 {
     int a = 0, i = 0, j = 0;
-    for(int x = 0; x < 9; x++) // по столбцам
+    for(int x = 0; x < 9; x++) // �� ��������
     {
         for(int numb1 = 1; numb1 < 10; numb1++)
         {
@@ -141,12 +140,12 @@ void third() // третий алгоритм
                         j = j * 10 + y;
                     }
                 }
-                part_of_third(a, i, j, numb1, numb2);
+                part_of_third(a, i, j, numb1, numb2, m1);
                 a = i = j = 0;
             }
         }
     }
-    for(int y = 0; y < 9; y++) // по строкам
+    for(int y = 0; y < 9; y++) // �� �������
     {
         for(int numb1 = 1; numb1 < 10; numb1++)
         {
@@ -166,12 +165,12 @@ void third() // третий алгоритм
                         j = j * 10 + y;
                     }
                 }
-                part_of_third(a, i, j, numb1, numb2);
+                part_of_third(a, i, j, numb1, numb2, m1);
                 a = i = j = 0;
             }
         }
     }
-    for(int X = 0; X < 3; X++) // по малым квадратам
+    for(int X = 0; X < 3; X++) // �� ����� ���������
     {
         for(int Y = 0; Y < 3; Y++)
         {
@@ -197,7 +196,7 @@ void third() // третий алгоритм
                         }
                         if(a == 1000) break;
                     }
-                    if(i / 10 != i % 10 && j / 10 != j % 10) part_of_third(a, i, j, numb1, numb2);
+                    if(i / 10 != i % 10 && j / 10 != j % 10) part_of_third(a, i, j, numb1, numb2, m1);
                     a = i = j = 0;
                 }
             }
@@ -208,38 +207,42 @@ void third() // третий алгоритм
 
 int main()
 {
-    memset(m, 0, sizeof(m));
-    memset(m1, 0, sizeof(m1));
-    for(int j = 0; j < 9; j++) // ввод
+    vector <vector<int> > field (9, vector <int> (9)); // ���� ������
+    vector <vector <vector<int> > > flag (9, vector <vector <int> > (9, vector <int> (9))); // ������ ������ ����������� ��������� �����
+    int circ = 0; // ������� ��� �������� �������� ����
+    int summ = 81; // ���������� ������ ������ �� ����
+    int summ_prev = 0; // ���������� ������ ������ �� ���������� �������� ��������� �����
+    for(int j = 0; j < 9; j++) // ���� ����-�������
     {
         for(int i = 0; i < 9; i++)
         {
-            cin >> m[i][j];
-            if(m[i][j] != 0)  summ--;
+            cin >> field[i][j];
+            if(field[i][j] != 0)  summ--;
         }
     }
     cout << endl;
-    for(int y = 0; y < 9; y++)
+    for(int y = 0; y < 9; y++) // �� �������� ������ ����������� ����������� �������� ���������� ����� ����
     {
         for(int x = 0; x < 9; x++)
         {
-            if(m[x][y] != 0) first(x, y, m[x][y]);
+            if(field[x][y]) first(x, y, field[x][y], field, flag);
         }
     }
-    while(w != 10 && summ != 0)
+    while(summ != 0 || summ == summ_prev) // �������� ����
     {
+        summ_prev = summ;
         for(int y = 0; y < 9; y++)
         {
             for(int x = 0; x < 9; x++)
             {
-                if(m[x][y] == 0) second(x, y);
+                if(field[x][y] == 0) second(x, y, &summ, field, flag);
             }
         }
-        third();
-        w++;
+        third(field, flag);
+        circ++;
     }
     cout << endl;
-    /*for (int i = 1; i < 10; i++)
+    /*for (int i = 1; i < 10; i++) ����� ������ ����������� ��������� �����
     {
         for(int j = 0; j < 9; j++)
         {
@@ -253,18 +256,22 @@ int main()
         cout << endl;
     }
     cout << endl;*/
-    for (int j = 0; j < 9; j++) // вывод
+    if (summ == summ_prev)
+    {
+        cout << "Not solved" << endl;
+    }
+    for (int j = 0; j < 9; j++) // ����� ��������� ����
     {
         for(int i = 0; i < 9; i++)
         {
-            cout << m[i][j] << " ";
+            cout << field[i][j] << " ";
             if(i % 3 == 2) cout << " ";
             if(j % 3 == 2 && i == 8) cout << endl;
         }
         cout << endl;
     }
     cout << endl;
-    cout << w << endl;
-    cout << summ << endl;
+    cout << "How many time work main while: " << circ << endl;
+   // cout << summ << endl;
     return 0;
 }
