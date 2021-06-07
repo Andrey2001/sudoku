@@ -6,7 +6,7 @@ class thread
     public:
     int i;
     int j;
-    int numb;
+    std::vector <int> numb;
     std::vector <std::vector<int> > arr;
 
     thread ()

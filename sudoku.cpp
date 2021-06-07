@@ -29,7 +29,7 @@ void first(int i, int j,
             if(m[i1][j1] == 0) m1[i1][j1][numb] = 1;
         }
     }
-    if (t == 1)
+    if (t == 1) // ели диагональное судоку
     {
         if (i == j) // главная диагональ
         {
@@ -46,47 +46,32 @@ void first(int i, int j,
             }
         }
     }
-    if (t == 2)
+    if (t == 2) // если виндоку
     {
-        if (0 < i && i < 4 && 0 < j && j < 4)
+        if (i % 4 && j % 4) // условие, что клетка в доп малом квадрате
         {
-            for (int x = 1; x < 4; x++)
+            for (int x = i - (i % 4) + 1; x < i - (i % 4) + 4; x++) // проход по дополнительному малому квадрату
             {
-                for (int y = 1; y < 4; y++)
+                for (int y = j - (j % 4) + 1; y < j - (j % 4) + 4; y++)
                 {
                     if (m[x][y] == 0) m1[x][y][numb] = 1;
                 }
             }
         }
-        if (0 < i && i < 4 && 4 < j && j < 8)
+    }
+    if (t == 3) // если судоку-астериск
+    {
+        if (((j == 2 || j == 6) && (i == 6 || i == 2)) || (i == 4 && (j == 1 || j == 7 || j == 4)) || (j == 4 && (i == 1 || i == 7)))
         {
-            for (int x = 1; x < 4; x++)
-            {
-                for (int y = 5; y < 8; y++)
-                {
-                    if (m[x][y] == 0) m1[x][y][numb] = 1;
-                }
-            }
-        }
-        if (4 < i && i < 8 && 0 < j && j < 4)
-        {
-            for (int x = 5; x < 8; x++)
-            {
-                for (int y = 1; y < 4; y++)
-                {
-                    if (m[x][y] == 0) m1[x][y][numb] = 1;
-                }
-            }
-        }
-        if (4 < i && i < 8 && 4 < j && j < 8)
-        {
-            for (int x = 5; x < 8; x++)
-            {
-                for (int y = 5; y < 8; y++)
-                {
-                    if (m[x][y] == 0) m1[x][y][numb] = 1;
-                }
-            }
+            m1[2][2][numb] = 1;
+            m1[2][6][numb] = 1;
+            m1[6][2][numb] = 1;
+            m1[6][6][numb] = 1;
+            m1[1][4][numb] = 1;
+            m1[4][1][numb] = 1;
+            m1[4][7][numb] = 1;
+            m1[7][4][numb] = 1;
+            m1[4][4][numb] = 1;
         }
     }
 }
@@ -301,12 +286,13 @@ void correct (vector <vector<int> > &field) // проверяет, что в р�
              }
              if (flag)
              {
-                 cout << "error1 on field" << endl;
+                 cout << "error on field in line" << endl;
                  return;
              }
              flag = 1;
         }
     }
+
     for (int i = 0; i < 9; i++) // проверяем столбцы
     {
         for (int numb = 0; numb < 9; numb++)
@@ -321,12 +307,13 @@ void correct (vector <vector<int> > &field) // проверяет, что в р�
              }
              if (flag)
              {
-                 cout << "error1 on field" << endl;
+                 cout << "error on field in column" << endl;
                  return;
              }
              flag = 1;
         }
     }
+
     for(int X = 0; X < 3; X++) // проверяем малые квадраты
     {
         for(int Y = 0; Y < 3; Y++)
@@ -347,7 +334,7 @@ void correct (vector <vector<int> > &field) // проверяет, что в р�
                 }
                 if (flag)
                 {
-                    cout << endl << "error3 on field " << endl;
+                    cout << endl << "error on field in small square" << endl;
                     return;
                 }
                 flag = 1;
@@ -389,8 +376,8 @@ void my_main (vector <vector<int> > &field,
     int circ = 0; // сколько раз сработал основной цикл
     int summ_prev = 0; // количество пустых клеток на предыдущей итерации основного цикла
     bool check = 0; // флаг, обращается в единицу если нельзя поставить никакую цифру в клетку
-    int deep = 0;
-    int max_deep = 0;
+    int deep = 0; // текущая глубина нити Ариадны
+    int max_deep = 0; // максимальная длина нити Ариадны
     if (test == 0)
     {
         for(int i = 0; i < 9; i++) // ввод поля-задания
@@ -398,11 +385,7 @@ void my_main (vector <vector<int> > &field,
             for(int j = 0; j < 9; j++)
             {
                 cin >> field[i][j];
-                if(field[i][j])
-                {
-                    summ--;
-                    first(i, j, field[i][j] - 1, field, flag, t); // по исходным числам отбрасываем невозможные варианты постановки новых цифр
-                }
+                if(field[i][j]) summ--;
             }
         }
     }
@@ -414,15 +397,16 @@ void my_main (vector <vector<int> > &field,
             }
         }
 
-    while(summ != 0 && circ != 100) // основной цикл
+    while(summ != 0) // основной цикл работает не больше ста раз
     {
-        if (summ == summ_prev)
+        if (summ == summ_prev) // если простые методы исерпали себя включаем тяжёлую артиллерию
         {
             clue (field, flag, thr, &deep, &summ, t);
             if (deep > max_deep) max_deep = deep;
+            if (deep == 0) break;
         }
         summ_prev = summ;
-        for(int i = 0; i < 9; i++) // проход по пустым клеткам
+        for(int i = 0; i < 9; i++) // проход по пустым клеткам вторым алгоритмом
         {
             for(int j = 0; j < 9; j++)
             {
@@ -461,7 +445,7 @@ void my_main (vector <vector<int> > &field,
     }
     if (summ == summ_prev && summ != 0)
     {
-        cout << "Not solved" << endl;
+        cout << "Not solved " << summ << endl;
     }
     correct (field);
     cout << endl;
@@ -530,9 +514,10 @@ int main(int argc, char **argv)
     char flag = 'y';
     while (flag == 'y')
     {
-        cout << "Welcome. For standart sudoku enter 0, for diagonal sudoku enter 1, for windoku enter 2: ";
+        cout << "Welcome. For standart sudoku enter 0, for diagonal sudoku enter 1,"  << endl;
+        cout << "for windoku enter 2, for sudoku-asterisc enter 3: ";
         cin >> type;
-        while (type < 0 || type > 2)
+        while (type < 0 || type > 3)
         {
             cout << "You take mistake. Repeat, please: ";
             cin >> type;
